@@ -19,8 +19,8 @@ class Grid():
         buttons = {}
         for x in range(self.gridSize):
             for y in range(self.gridSize):
-                buttons["btn{}{}".format(x,y)] = Button(window, text = "" , fg='black', state='normal', width = self.buttonSize)
-                current_button=buttons["btn{}{}".format(x,y)]
+                buttons["btn{}-{}".format(x,y)] = Button(window, text = "" , fg='black', state='normal', width = self.buttonSize)
+                current_button=buttons["btn{}-{}".format(x,y)]
                 current_button.bind('<Button-1>', lambda btn=current_button,xx=x,yy=y: self.leftClick(xx,yy,btn))
                 current_button.bind('<Button-2>', lambda btn=current_button,xx=x,yy=y: self.rightClick(xx,yy,btn))
                 # set Button grid
@@ -47,10 +47,10 @@ class Grid():
     def rightClick(self,xx,yy,btn):
         print('right clicked button ',xx,' ',yy)
         if [xx,yy] not in self.taggedBoxes:
-            self.buttons["btn{}{}".format(xx,yy)].config(image = self.flagImage)
+            self.buttons["btn{}-{}".format(xx,yy)].config(image = self.flagImage)
             self.taggedBoxes.append([xx,yy])
         else:
-            self.buttons["btn{}{}".format(xx,yy)].config(image = '')
+            self.buttons["btn{}-{}".format(xx,yy)].config(image = '')
             self.taggedBoxes.remove([xx,yy])
 
     def generateMinePositions(self):
@@ -79,8 +79,9 @@ class Grid():
         self.countAdjacentMines()
         for x in range(self.gridSize):
             for y in range(self.gridSize):
-                self.buttons["btn{}{}".format(x,y)]['text'] = ''
-                self.buttons["btn{}{}".format(x,y)].config(image = '')
+                self.buttons["btn{}-{}".format(x,y)]['text'] = ''
+                self.buttons["btn{}-{}".format(x,y)].config(image = '')
+                self.buttons["btn{}-{}".format(x,y)].config(state = NORMAL)
                 
     def countAdjacentMines(self):
         for x in range(self.gridSize):
@@ -101,18 +102,19 @@ class Grid():
         for x in range(self.gridSize):
             for y in range(self.gridSize):
                 if self.cellContents[(x,y)] == 'm':
-                    self.buttons["btn{}{}".format(x,y)].config(image = self.mineImage)
-                    self.buttons["btn{}{}".format(x,y)].config(text = '')
+                    self.buttons["btn{}-{}".format(x,y)].config(image = self.mineImage)
+                    self.buttons["btn{}-{}".format(x,y)].config(text = '')
                 else:
-                    self.buttons["btn{}{}".format(x,y)].config(text = self.cellContents[(x,y)])
+                    self.buttons["btn{}-{}".format(x,y)].config(text = self.cellContents[(x,y)])
 
     def revealBox(self,x,y):
         if self.cellContents[(x,y)] == 'm':
-            self.buttons["btn{}{}".format(x,y)].config(image = self.mineImage)
-            self.buttons["btn{}{}".format(x,y)].config(text = '')
+            self.buttons["btn{}-{}".format(x,y)].config(image = self.mineImage)
+            self.buttons["btn{}-{}".format(x,y)].config(text = '')
             gameOver()
         else:
-            self.buttons["btn{}{}".format(x,y)].config(text = self.cellContents[(x,y)])
+            self.buttons["btn{}-{}".format(x,y)].config(text = self.cellContents[(x,y)])
+            self.buttons["btn{}-{}".format(x,y)].config(state = DISABLED)
             if [x,y] not in self.unclearedBoxes:
                 self.unclearedBoxes.append([x,y])
             
@@ -175,10 +177,11 @@ class Grid():
         lbl.grid(column=0, row = self.gridSize+1, columnspan = self.gridSize)
         for x in range(self.gridSize):
             for y in range(self.gridSize):
-                buttons["btn{}{}".format(x,y)] = Button(root, text = "" , fg='black', state='normal', width = self.buttonSize)
-                current_button=buttons["btn{}{}".format(x,y)]
+                buttons["btn{}-{}".format(x,y)] = Button(root, text = "" , fg='black', state='normal', width = self.buttonSize)
+                current_button=buttons["btn{}-{}".format(x,y)]
                 current_button.bind('<Button-1>', lambda btn=current_button,xx=x,yy=y: self.leftClick(xx,yy,btn))
                 current_button.bind('<Button-2>', lambda btn=current_button,xx=x,yy=y: self.rightClick(xx,yy,btn))
+                current_button.config(state = NORMAL)
                 # set Button grid
                 current_button.grid(column=x, row=y)
         self.buttons = buttons
@@ -196,6 +199,9 @@ class Grid():
 def gameOver():
         message = 'You Lose'
         updateMessage(message)
+        for x in range(grid.gridSize):
+            for y in range(grid.gridSize):
+                grid.buttons["btn{}-{}".format(x,y)].config(state = DISABLED)
 
 def onWin():
     message = 'You Win!'
