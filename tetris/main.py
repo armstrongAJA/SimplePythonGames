@@ -32,6 +32,16 @@ def draw_score(screen, score, x, y):
     font = pygame.font.Font(None, size)
     text = font.render("Score: {}".format(score), True, WHITE)
     screen.blit(text, (x, y))
+
+def draw_high_score(screen, high_score, x, y):
+    """Draw the score on the screen"""
+    size = 20
+    rect = pygame.Rect(x, y, size*5, size)
+    pygame.draw.rect(screen, BLACK, rect)
+
+    font = pygame.font.Font(None, size)
+    text = font.render("High Score: {}".format(high_score), True, WHITE)
+    screen.blit(text, (x, y))
     
     
 def draw_game_over(screen, x, y):
@@ -93,19 +103,29 @@ def main():
             game.updatePiece()
             # Reset the fall time
             fall_time = 0
+        fall_speed += game.speed
+        game.speed = 0
+        
         # Draw the grid and the current piece
 
         game.draw(screen)
         draw_score(screen, game.score, 20, 20)
+        draw_high_score(screen, game.highScore, 20, 30)
         # Draw the score on the screen
         if game.isGameOver:
             # Draw the "Game Over" message
+            screen.fill(BLACK)
             draw_game_over(screen, WIDTH // 2 - 100, HEIGHT // 2 - 30)  # Draw the "Game Over" message
             # You can add a "Press any key to restart" message here
             # Check for the KEYDOWN event
+            if game.score > game.highScore:
+                game.highScore = game.score
+                game.saveHighScore('highScore.txt')
+                print('saving score...')
             if event.type == pygame.KEYDOWN:
                 # Create a new Tetris object
                 game = tetris.Tetris(WIDTH // GRID_SIZE, HEIGHT // GRID_SIZE)
+                print('resetting game...')
         # Update the display
         pygame.display.flip()
         # Set the framerate

@@ -3,6 +3,7 @@ import pygame
 import random
 import globalVariables as mn
 from piece import piece as Piece
+import os.path
 
 class Tetris():
     
@@ -13,6 +14,8 @@ class Tetris():
         self.currentPiece = self.newPiece()
         self.isGameOver = False
         self.score = 0
+        self.speed = 0
+        self.highScore = self.loadHighScore('highScore.txt')
 
     def newPiece(self):
         shape = random.choice(mn.SHAPES)
@@ -39,8 +42,10 @@ class Tetris():
                 del self.grid[i]
                 self.grid.insert(0, [0 for x in range(self.width)])
                 clearedLines+=1
+        self.speed-=clearedLines
+        
         return clearedLines
-    
+
     def lockPiece(self, piece):
         print('locking piece...')
         for i, row in enumerate(piece.shape[piece.rotation%len(piece.shape)]):
@@ -76,3 +81,15 @@ class Tetris():
                 for j, cell in enumerate(row):
                     if cell == '0':
                         pygame.draw.rect(screen, self.currentPiece.color, ((self.currentPiece.x + j) * mn.GRID_SIZE, (self.currentPiece.y + i) * mn.GRID_SIZE, mn.GRID_SIZE - 1, mn.GRID_SIZE - 1))
+
+    def loadHighScore(self, file_path):
+        if os.path.isfile(file_path):
+            with open(file_path) as f:
+                return int(f.read())
+        else:
+            return 0
+
+    def saveHighScore(self, file_path):
+        with open(file_path, "w") as f:
+            f.write(str(self.highScore))
+        
